@@ -26,6 +26,8 @@ redraw(Image *screen)
 			draw(screen, rectaddpt(buttons[i][j], screen->r.min),
 				buttonstate[i][j]? display->white: display->black,
 				nil, ZP);
+
+	flushimage(display, 1);
 }
 
 void
