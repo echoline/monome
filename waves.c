@@ -12,6 +12,8 @@ int rate;
 double tones[16];
 double *buf[2];
 double ab = 0.0;
+Rectangle A;
+Rectangle B;
 
 void
 redraw(Image *screen)
@@ -36,16 +38,16 @@ redraw(Image *screen)
 	r.min.y += 30;
 	r.max.y -= 30;
 	r.max.x -= Dx(screen->r)/2;
-	r = insetrect(r, 3);
-	w = Dx(r);
-	h = Dy(r);
-	draw(screen, r, display->white, nil, ZP);
+	A = insetrect(r, 3);
+	w = Dx(A);
+	h = Dy(A);
+	draw(screen, A, display->white, nil, ZP);
 	for(i = 0; i < dur; i++){
 		dot = rectaddpt(Rect((int)(((double)i/dur) * w),
 							(int)(((buf[0][i] + 1.0)/2.0) * h),
 							(int)(((double)(i+1)/dur) * w),
 							(int)(((buf[0][i] + 1.0)/2.0) * h) + 1),
-				r.min);
+				A.min);
 		draw(screen, dot, display->black, nil, ZP);
 	}
 
@@ -62,16 +64,16 @@ redraw(Image *screen)
 	r.min.y += 30;
 	r.max.y -= 30;
 	r.min.x += Dx(screen->r)/2;
-	r = insetrect(r, 3);
-	w = Dx(r);
-	h = Dy(r);
-	draw(screen, r, display->white, nil, ZP);
+	B = insetrect(r, 3);
+	w = Dx(B);
+	h = Dy(B);
+	draw(screen, B, display->white, nil, ZP);
 	for(i = 0; i < dur; i++){
 		dot = rectaddpt(Rect((int)(((double)i/dur) * w),
 							(int)(((buf[1][i] + 1.0)/2.0) * h),
 							(int)(((double)(i+1)/dur) * w),
 							(int)(((buf[1][i] + 1.0)/2.0) * h) + 1),
-				r.min);
+				B.min);
 		draw(screen, dot, display->black, nil, ZP);
 	}
 
@@ -183,7 +185,7 @@ threadmain(int argc, char **argv)
 				ab -= 0.5;
 				ab *= 2.0;
 			}
-			if ((screen->r.max.y - m.xy.y) < 30){
+			else if ((screen->r.max.y - m.xy.y) < 30){
 				dx = Dx(screen->r)/6;
 				if (xy.x < dx)
 					for(i = 0; i < dur; i++)
@@ -215,6 +217,16 @@ threadmain(int argc, char **argv)
 					for(i = dur/2; i < dur; i++)
 						buf[1][i] = -(0.75-((double)i/dur))*4.0;
 				}
+			}
+			else if(ptinrect(m.xy, A)) {
+				xy = subpt(m.xy, A.min);
+				dx = Dx(A);
+				buf[0][(int)(((double)xy.x/dx)*dur)] = (((double)xy.y/Dy(A))-0.5)*2.0;
+			}
+			else if(ptinrect(m.xy, B)) {
+				xy = subpt(m.xy, B.min);
+				dx = Dx(B);
+				buf[1][(int)(((double)xy.x/dx)*dur)] = (((double)xy.y/Dy(B))-0.5)*2.0;
 			}
 			redraw(screen);
 		}
