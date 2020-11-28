@@ -11,6 +11,6 @@ main(int argc, char **argv)
 		if((readn(0, buf, rate)) < rate)
 			break;
 		write(1, buf, rate);
-		sleep(235);
+		sleep(250);
 	}
 }

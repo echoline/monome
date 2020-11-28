@@ -22,11 +22,11 @@ reverb(unsigned char *buf, short *tmp, int len)
 		l = buf[i+0] | (buf[i+1] << 8);
 		r = buf[i+2] | (buf[i+3] << 8);
 
-		l += tmp[(i/2+0+dur)%len] * decay;
-		r += tmp[(i/2+1+dur)%len] * decay;
+		l += tmp[(i/2+0+dur)%rate] * decay;
+		r += tmp[(i/2+1+dur)%rate] * decay;
 
-		tmp[(i/2+0)%len] = l;
-		tmp[(i/2+1)%len] = r;
+		tmp[(i/2+0)%rate] = l;
+		tmp[(i/2+1)%rate] = r;
 
 		buf[i+0] = l & 0xFF;
 		buf[i+1] = (l >> 8) & 0xFF;
@@ -53,7 +53,7 @@ doproc(void *unused)
 void
 redraw(Image *screen)
 {
-	int x = delay;
+	int x = delay / 8;
 
 	draw(screen, screen->r, display->white, nil, ZP);
 
@@ -103,7 +103,7 @@ threadmain(int argc, char **argv)
 			if (xy.y > c.y)
 				decay = xy.x / (double)Dx(screen->r);
 			else
-				delay = xy.x;
+				delay = xy.x * 8;
 			
 			redraw(screen);
 		}
